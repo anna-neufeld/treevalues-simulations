@@ -3,9 +3,7 @@ Code / data / other files to reproduce figures in Neufeld, A., Gao, L.L., and Wi
 
 # Organization
 
-## Code to run simulations for paper
-
-This folder contains the code to actually run the simualations from Section 5 of the paper. 
+The folder "Code to run simulations for paper" contains the code to actually run the simualations from Section 5 of the paper. 
 - The file "Null_testing_sims.R" runs the simulation for Figure 4. Results from running this file are stored in 
 "null_res_1-18-2021-5000.csv". 
 - The file "run_power_rand.R" runs the simulation for Figure 5 (relies on code in "rand_power_indices.R"). Results from running this file are stored in 
