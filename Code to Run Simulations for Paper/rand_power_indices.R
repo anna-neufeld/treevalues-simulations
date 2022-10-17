@@ -66,7 +66,7 @@ full_Comparison_NEW <-  function(n,p,sigma_y, seed, complex = 0.01*n*sigma_y^2, 
   terminalNodes <- sort(unique(base_tree$where))
 
   if (length(terminalNodes) > 1) {
-    splitList <- getAllBranches(base_tree)
+    splitList <- getBranch(base_tree)
     i=1
 
     all_wheres <- matrix(ncol=n,nrow=length(splitList)/2)
@@ -111,7 +111,15 @@ full_Comparison_NEW <-  function(n,p,sigma_y, seed, complex = 0.01*n*sigma_y^2, 
       depth = length(splits)
       phi_bounds_split <- getInterval(base_tree, nu,splits)
       p_split <- correctPVal(phi_bounds_split, nu, y, sigma_y)
+      
+      p_split_est <- correctPVal(phi_bounds_split, nu, y, sd(y))
+      
       write(paste(c(complex, seed, depth, beta, "condition",p_split,
+                    true_signal_split, length(y1), length(y2), sample_signal,
+                    rand, i, XORlev, best,'\n'), collapse=" "), file=filename,append=TRUE)
+      
+      
+      write(paste(c(complex, seed, depth, beta, "condition_est",p_split_est,
                     true_signal_split, length(y1), length(y2), sample_signal,
                     rand, i, XORlev, best,'\n'), collapse=" "), file=filename,append=TRUE)
 
@@ -120,6 +128,8 @@ full_Comparison_NEW <-  function(n,p,sigma_y, seed, complex = 0.01*n*sigma_y^2, 
     ### If the fitted tree was only a root, it got onone of the true splits!!!
     for (i in 1:4) {
       write(paste(c(complex, seed, NA, beta, "condition",NA,
+                    NA, NA,NA, NA, 0, i,XORlev, NA,'\n'), collapse=" "), file=filename,append=TRUE)
+      write(paste(c(complex, seed, NA, beta, "condition_est",NA,
                     NA, NA,NA, NA, 0, i,XORlev, NA,'\n'), collapse=" "), file=filename,append=TRUE)
     }
   }
@@ -214,7 +224,7 @@ full_Comparison_NEW <-  function(n,p,sigma_y, seed, complex = 0.01*n*sigma_y^2, 
   test_predict = predict(split_tree, newdata=dat2)
 
   if (length(terminalNodes) > 1) {
-    splitList <- getAllBranches(split_tree)
+    splitList <- getBranch(split_tree)
     i=1
 
     ### DEFINITIONS OF DETECTION ARE ON ALL DATA: train + test
@@ -259,9 +269,20 @@ full_Comparison_NEW <-  function(n,p,sigma_y, seed, complex = 0.01*n*sigma_y^2, 
       se <- sqrt(sigma_y^2/length(y1) + sigma_y^2/length(y2))
       p_split <- (1-pnorm(abs((mean(y1)-mean(y2))/se)))*2
       depth = length(splits)
+      ### is this the fair comparison????
+      if (length(y1) > 1 & length(y2) > 2) {
+      p_split_est <- t.test(y1,y2)$p.value
+      } else {
+        ### Or should it be NA. 
+        p_split_est <- 1
+      }
 
 
       write(paste(c(complex, seed, depth, beta, "splitting",p_split,
+                    true_signal_split, length(y1), length(y2), sample_signal_split,
+                    rand, i, XORlev, best, '\n'), collapse=" "), file=filename,append=TRUE)
+      
+      write(paste(c(complex, seed, depth, beta, "splitting_est",p_split_est,
                     true_signal_split, length(y1), length(y2), sample_signal_split,
                     rand, i, XORlev, best, '\n'), collapse=" "), file=filename,append=TRUE)
     }

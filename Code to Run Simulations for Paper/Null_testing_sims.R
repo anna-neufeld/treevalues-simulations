@@ -1,9 +1,8 @@
 library(rpart)
-setwd("~/treevalues/")
-devtools::load_all()
+library(treevalues)
 
 
-setwd("~/Dropbox/Tree Values Paper/Code : Other for Creating All Figures/")
+setwd("~/Dropbox/Tree Values Paper/Code Reviewer Response/")
 n <- 200
 p <-10
 sigma_y <- 5
@@ -11,7 +10,7 @@ nTrials <- 5000
 pvals <- rep(0, nTrials)
 CIs <- matrix(0, nrow=nTrials, ncol=2)
 truths <- rep(0, nTrials)
-filename<- "null_res_6-01-2021-5000.csv"
+filename<- "null_res_var_est.csv"
 
 for (i in 1:nTrials) {
   set.seed(i)
@@ -30,7 +29,7 @@ for (i in 1:nTrials) {
 
   if (length(unique(base_tree$where)) > 1) {
   #### Go through EVERY SPLIT and EVERY NODE
-  splitList <- getAllBranches(base_tree)
+  splitList <- getBranch(base_tree)
   j=1
   while (j < length(splitList)) {
       splits <- splitList[j][[1]]
@@ -98,7 +97,7 @@ for (i in 1:nTrials) {
   terminalNodes <- sort(unique(full_predict))
 
   if (length(terminalNodes) > 1) {
-    splitList <- getAllBranches(split_tree)
+    splitList <- getBranch(split_tree)
     j=1
 
     ### DEFINITIONS OF DETECTION ARE ON ALL DATA: train + test

@@ -2,6 +2,7 @@ library(rpart)
 library(intervals)
 library(partykit)
 library(rpart.utils)
+library(treevalues)
 
 
 ### Runs a giant repetition for the confidence interval coverage and width experiments.
@@ -38,7 +39,7 @@ oneRepFull <-  function(n,p,sigma_y, seed, complex = 0.01*n*sigma_y^2, alpha = 0
   ### If it build a non-trivial rpart tree,
   if (length(unique(base_tree$where)) > 1) {
   #### Go through EVERY SPLIT and EVERY NODE
-  splitList <- getAllBranches(base_tree)
+  splitList <- getBranch(base_tree)
   j=1
   while (j < length(splitList)) {
       splits <- splitList[j][[1]]
@@ -71,9 +72,18 @@ oneRepFull <-  function(n,p,sigma_y, seed, complex = 0.01*n*sigma_y^2, alpha = 0
       p_split <- correctPVal(phi_bounds_split, nu, y, sigma_y)
       p_1 <- correctPVal(phi_bounds_1, nu1, y, sigma_y)
       p_2 <- correctPVal(phi_bounds_2, nu2, y, sigma_y)
+      
+      p_split_est <- correctPVal(phi_bounds_split, nu, y, sd(y))
+      p_1_est <- correctPVal(phi_bounds_1, nu1, y, sd(y))
+      p_2_est <- correctPVal(phi_bounds_2, nu2, y, sd(y))
+      
       CI_split <- computeCI(nu, y, sigma_y,phi_bounds_split, 0.05)
       CI_1 <- computeCI(nu1, y, sigma_y,phi_bounds_1, 0.05)
       CI_2 <- computeCI(nu2, y, sigma_y,phi_bounds_2, 0.05)
+      
+      CI_split_est <- computeCI(nu, y, sd(y),phi_bounds_split, 0.05)
+      CI_1_est <- computeCI(nu1, y, sd(y),phi_bounds_1, 0.05)
+      CI_2_est <- computeCI(nu2, y, sd(y),phi_bounds_2, 0.05)
 
       ### Saving stuff about size of set S. Used to be used for plots.
       ### Didn't end up in any plots in final paper, but still saved bc interesting to look at.
@@ -104,6 +114,17 @@ oneRepFull <-  function(n,p,sigma_y, seed, complex = 0.01*n*sigma_y^2, alpha = 0
       write(paste(c(beta,XORlev, cp, seed, "Tree-Values", "child", depth, p_2, CI_2, NA, length(y2), sample_signal_2,true_signal_2,NA,
                     sum(size(phi_bounds_2)), sum(size(numerator_2))), collapse=" "),
             file=filename,append=TRUE)
+      
+      write(paste(c(beta,XORlev, cp, seed, "Tree-Values-est", "split", depth, p_split_est, CI_split_est, length(y1), length(y2), sample_signal_split,true_signal_split,NA,
+                    sum(size(phi_bounds_split)), sum(size(numerator_split))), collapse=" "),
+            file=filename,append=TRUE)
+      write(paste(c(beta,XORlev, cp, seed, "Tree-Values-est", "child", depth, p_1_est, CI_1_est, length(y1), NA, sample_signal_1,true_signal_1,NA,
+                    sum(size(phi_bounds_1)), sum(size(numerator_1))), collapse=" "),
+            file=filename,append=TRUE)
+      write(paste(c(beta,XORlev, cp, seed, "Tree-Values-est", "child", depth, p_2_est, CI_2_est, NA, length(y2), sample_signal_2,true_signal_2,NA,
+                    sum(size(phi_bounds_2)), sum(size(numerator_2))), collapse=" "),
+            file=filename,append=TRUE)
+      
       write(paste(c(beta,XORlev, cp, seed, "naiveZ", "split", depth, p_splitZ, CI_splitZ, length(y1), length(y2), sample_signal_split,true_signal_split,NA,
                    NA,NA), collapse=" "),
             file=filename,append=TRUE)
@@ -135,7 +156,7 @@ oneRepFull <-  function(n,p,sigma_y, seed, complex = 0.01*n*sigma_y^2, alpha = 0
   test_predict = predict(split_tree, newdata=dat2)
 
   if (length(terminalNodes) > 1) {
-    splitList <- getAllBranches(split_tree)
+    splitList <- getBranch(split_tree)
     j=1
     while (j < length(splitList)) {
 

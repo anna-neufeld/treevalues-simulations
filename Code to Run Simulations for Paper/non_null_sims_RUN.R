@@ -1,8 +1,7 @@
-setwd("~/treevalues")
-devtools::load_all()
+library(treevalues)
 
 
-setwd("~/REPRODUCE FIGURES TO MAKE SURE THEY STILL WORK/")
+setwd("~/Dropbox/Tree Values Paper/Code Reviewer Response/")
 source("Code to Run Simulations for Paper/non_null_CI_sims.R")
 
 
@@ -17,7 +16,7 @@ maxdepth=3
 
 for (j in 1:length(betas)) {
   print(j)
-  filename <- "non_null_CI_main-5-27-2021"
+  filename <- "non_null_CI_main-4-4-2022"
 
   oneRepFull(n=n,p=p,sigma_y=sigma_y, seed=j, complex=200, beta=betas[j],
                       filename =   filename ,
